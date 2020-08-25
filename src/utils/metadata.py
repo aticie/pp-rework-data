@@ -12,7 +12,7 @@ class MetaClass:
 
 
 def get_scores_of_bmap_from_api(bmap_id):
-    params = {'k': os.environ['API_KEY'], 'b': bmap_id, 'limit': 100}
+    params = {'k': os.environ['API_KEY'], 'b': bmap_id}
     with requests.get(f'https://osu.ppy.sh/api/get_scores', params=params) as r:
         return [ScoreMeta(j) for j in r.json()]
 

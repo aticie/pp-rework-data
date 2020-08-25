@@ -25,16 +25,27 @@ if __name__ == '__main__':
     # Get beatmap metadata from api
     for bmap_id in bmap_ids:
         print(f'Getting beatmap information for bmap id: {bmap_id}')
+        bmap_save_folder = os.path.join('cache', 'beatmaps')
+        score_save_folder = os.path.join('cache', 'scores', f'{bmap_id}')
+
+        os.makedirs(bmap_save_folder, exist_ok=True)
+        os.makedirs(score_save_folder, exist_ok=True)
+
+        bmap_save_path = os.path.join(bmap_save_folder, f'{bmap_id}.osu')
+
+        if os.path.exists(bmap_save_path):
+            score_count = len(os.listdir(score_save_folder))
+            if score_count == 50:
+                continue
+
         bmap_meta = metadata.BeatmapMeta()
         bmap_meta.get_from_api(bmap_id)
         time.sleep(.5)  # Maybe can get rate limited
 
-        print(f'Getting top 100 scores of: {bmap_meta.title}')
+        print(f'Getting top 50 scores of: {bmap_meta.title}')
         scores = metadata.get_scores_of_bmap_from_api(bmap_id)
         time.sleep(.5)  # Maybe can get rate limited
-        os.makedirs(os.path.join('cache', 'beatmaps'), exist_ok=True)
         url = f'https://osu.ppy.sh/osu/{bmap_id}'
-        bmap_save_path = os.path.join('cache', 'beatmaps', f'{bmap_id}.osu')
         with requests.get(url) as r:
             with open(bmap_save_path, 'w', encoding='utf-8') as f:
                 f.write(r.content.decode('utf-8'))
@@ -42,7 +53,7 @@ if __name__ == '__main__':
             pickle.dump(bmap_meta, f)
 
         for score in tqdm(scores):
-            score_save_path = os.path.join('cache', 'scores', f'{score.score_id}.pkl')
+            score_save_path = os.path.join(score_save_folder, f'{score.score_id}.pkl')
             if not score.replay_available:
                 continue
             if os.path.exists(score_save_path):
@@ -52,7 +63,6 @@ if __name__ == '__main__':
             time.sleep(6)  # As this is quite a load-heavy request, it has special rules about rate limiting.
             # You are only allowed to do 10 requests per minute.
             # Also, please note that this request is not intended for batch retrievals.
-            os.makedirs(os.path.join('cache', 'scores'), exist_ok=True)
             score_with_replay = ScoreWithReplay(score, replay_data)
             with open(score_save_path, 'wb') as f:
                 pickle.dump(score_with_replay, f)

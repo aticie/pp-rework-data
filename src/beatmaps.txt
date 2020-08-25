@@ -22,3 +22,5 @@ https://osu.ppy.sh/beatmapsets/1077982#osu/2255709
 https://osu.ppy.sh/beatmapsets/632870#osu/1344602
 https://osu.ppy.sh/beatmapsets/650027#osu/1377588
 https://osu.ppy.sh/beatmapsets/801074#osu/1681634
+https://osu.ppy.sh/beatmapsets/352624#osu/777074
+https://osu.ppy.sh/beatmapsets/352624#osu/777073
