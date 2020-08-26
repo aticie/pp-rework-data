@@ -102,6 +102,8 @@ class HitObjectPair:
             if vel > self.max_vel_point.velocity:
                 self.max_vel_point.set_frames(f1, f2)
 
+        return inside_first_hitobj, outside_first_hitobj, inside_second_hitobj
+
 
 # Fuck sliders for now
 class SliderPointPairs:
@@ -118,7 +120,7 @@ class SliderPointPairs:
 def get_hitobject_pairs(beatmap: Beatmap, score_meta: ScoreMeta) -> List[HitObjectPair]:
     enabled_mods = int(score_meta.enabled_mods)
     hr_enabled = (enabled_mods & 16) == 16
-    hitobjects = beatmap.hit_objects(sliders=False, spinners=False, hard_rock=hr_enabled)
+    hitobjects = beatmap.hit_objects(hard_rock=hr_enabled)
     circle_size = beatmap.cs(hard_rock=hr_enabled)
     overall_difficulty = beatmap.od(hard_rock=hr_enabled)
     circle_diameter = 109 - 9 * circle_size
@@ -127,15 +129,16 @@ def get_hitobject_pairs(beatmap: Beatmap, score_meta: ScoreMeta) -> List[HitObje
 
     hitobj_pairs = []
     for hitobj1, hitobj2 in zip(hitobjects[:-1], hitobjects[1:]):
-
         # We do not want touching hit objects
         touching = position.distance(hitobj1.position, hitobj2.position) <= circle_diameter
         # We do not want stacked hit objects
         stacked = hitobj1.position == hitobj2.position
         # We do not want long time intervals between hit objects
         long_time_between_objects = hitobj1.time - hitobj2.time > time_threshold
+        # Both hit objects must be circle
+        both_circle = type(hitobj1).__name__ == 'Circle' and type(hitobj2).__name__ == 'Circle'
 
-        if not (stacked or touching or long_time_between_objects):
+        if not (stacked or touching or long_time_between_objects or both_circle):
             hitobj_pairs.append(HitObjectPair(hitobj1, hitobj2, overall_difficulty, circle_size))
 
     return hitobj_pairs
