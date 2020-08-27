@@ -105,18 +105,6 @@ class HitObjectPair:
         return inside_first_hitobj, outside_first_hitobj, inside_second_hitobj
 
 
-# Fuck sliders for now
-class SliderPointPairs:
-    def __init__(self, hit1: HitObject, hit2: HitObject, hit_window: timedelta, circle_size: float):
-        self.point1 = hit1
-        self.point2 = hit2
-        self.distance = position.distance(hit1.position, hit2.position)
-        self.start_time = hit1.time - hit_window
-        self.end_time = hit2.time + hit_window
-        self.circle_radius = (109 - 9 * circle_size) / 2
-        self.max_vel_point = MaxVelocityPoint()
-
-
 def get_hitobject_pairs(beatmap: Beatmap, score_meta: ScoreMeta) -> List[HitObjectPair]:
     enabled_mods = int(score_meta.enabled_mods)
     hr_enabled = (enabled_mods & 16) == 16

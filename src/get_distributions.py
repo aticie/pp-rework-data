@@ -1,27 +1,24 @@
-import pickle as pkl
-import json
 import os
 
 from utils.hitobj_cursor_relations import *
-from utils.replay_data import ScoreWithReplay, ReplayFrameWithAbsTime
+from utils.replay_data import Replay
 from utils.metadata import ScoreMeta
 
 import numpy as np
 from slider import Beatmap
 
 bmap_cache = os.path.join('cache', 'beatmaps')
-scores_cache = os.path.join('cache', 'fixed_scores')
+scores_cache = os.path.join('cache', 'new_scores')
 
 
 def extract_max_velocity_data_as_npy(bmap_id, score_id, save_path):
-    replay_path = os.path.join(scores_cache, f'{bmap_id}', f'{score_id}.pkl')
+    replay_path = os.path.join(scores_cache, f'{bmap_id}', f'{score_id}.lzma')
     score_meta_path = os.path.join(scores_cache, f'{bmap_id}', f'{score_id}.json')
 
-    with open(replay_path, 'rb') as f:
-        replay_frames = pkl.load(f)
-    with open(score_meta_path, 'r') as f:
-        score_meta = ScoreMeta(json.load(f))
+    replay = Replay.from_path(replay_path)
+    score_meta = ScoreMeta.from_path(score_meta_path)
 
+    replay_frames = replay.parse_frames()
     print(f'Nr of replay frames:{len(replay_frames)}')
 
     bmap_path = os.path.join(bmap_cache, f'{bmap_id}.osu')
@@ -72,8 +69,9 @@ def extract_max_velocity_data_as_npy(bmap_id, score_id, save_path):
                               hitobj_pair.hit_obj2.time.total_seconds() * 1000,
                               # Time in ms of hit objects
 
-                              (hitobj_pair.hit_obj2.time - hitobj_pair.hit_obj1.time).total_seconds() * 1000
+                              (hitobj_pair.hit_obj2.time - hitobj_pair.hit_obj1.time).total_seconds() * 1000,
                               # Time between hit objects
+                              int(score_meta.enabled_mods)
                               ]
 
         required_data.append(max_velocity_array)
@@ -86,13 +84,18 @@ if __name__ == '__main__':
 
     extracted_data_folder = 'data'
     os.makedirs(extracted_data_folder, exist_ok=True)
-    
+
     for bmap_id in os.listdir(scores_cache):
         bmap_folder = os.path.join(scores_cache, bmap_id)
-        for score_id_dot_pkl in os.listdir(bmap_folder):
-            if score_id_dot_pkl.endswith('.json'):
+        for score_id_dot_lzma in os.listdir(bmap_folder):
+            if not score_id_dot_lzma.endswith('.lzma'):
                 continue
-            score_id = score_id_dot_pkl.replace('.pkl', '')
+            score_id = score_id_dot_lzma.replace('.lzma', '')
 
             save_path = os.path.join(extracted_data_folder, f'{bmap_id}_{score_id}.npy')
             extract_max_velocity_data_as_npy(bmap_id, score_id, save_path)
+    '''
+    bmap_id = 1714634
+    score_id = 2627460092
+    extract_max_velocity_data_as_npy(bmap_id, score_id, save_path=f'{bmap_id}_{score_id}.npy')
+    '''

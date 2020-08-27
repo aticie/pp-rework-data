@@ -1,19 +1,11 @@
 import time
-import pickle
 import os
 
 from utils import metadata
 from utils.replay_data import Replay
+from utils.beatmap import Beatmap
 
 from tqdm import tqdm
-import requests
-
-
-class ScoreWithReplay:
-    def __init__(self, score_meta, replay_data):
-        self.score = score_meta
-        self.replay = replay_data
-
 
 if __name__ == '__main__':
     # Parse beatmap list from txt
@@ -26,7 +18,7 @@ if __name__ == '__main__':
     for bmap_id in bmap_ids:
         print(f'Getting beatmap information for bmap id: {bmap_id}')
         bmap_save_folder = os.path.join('cache', 'beatmaps')
-        score_save_folder = os.path.join('cache', 'scores', f'{bmap_id}')
+        score_save_folder = os.path.join('cache', 'new_scores', f'{bmap_id}')
 
         os.makedirs(bmap_save_folder, exist_ok=True)
         os.makedirs(score_save_folder, exist_ok=True)
@@ -37,32 +29,27 @@ if __name__ == '__main__':
             score_count = len(os.listdir(score_save_folder))
             if score_count == 50:
                 continue
+        else:
+            # Download and save beatmap (.osu file)
+            bmap = Beatmap.download(bmap_id)
+            bmap.save(bmap_save_path)
 
-        bmap_meta = metadata.BeatmapMeta()
-        bmap_meta.get_from_api(bmap_id)
+        print(f'Getting top 50 scores of: {bmap_id}')
+        scores = metadata.ScoreMeta.top_n_from_api(bmap_id)
         time.sleep(.5)  # Maybe can get rate limited
-
-        print(f'Getting top 50 scores of: {bmap_meta.title}')
-        scores = metadata.get_scores_of_bmap_from_api(bmap_id)
-        time.sleep(.5)  # Maybe can get rate limited
-        url = f'https://osu.ppy.sh/osu/{bmap_id}'
-        with requests.get(url) as r:
-            with open(bmap_save_path, 'w', encoding='utf-8') as f:
-                f.write(r.content.decode('utf-8'))
-        with open(os.path.join('cache', 'beatmaps', f'{bmap_id}.pkl'), 'wb') as f:
-            pickle.dump(bmap_meta, f)
 
         for score in tqdm(scores):
-            score_save_path = os.path.join(score_save_folder, f'{score.score_id}.pkl')
+
+            score_meta_save_path = os.path.join(score_save_folder, f'{score.score_id}.json')
+
             if not score.replay_available:
                 continue
-            if os.path.exists(score_save_path):
+            if os.path.exists(score_meta_save_path):
                 continue
-            replay_data = Replay()
-            replay_data.get_from_api(score.score_id)
+
+            replay_data = Replay.from_api(score.score_id)
+            replay_data.save(score_save_folder)
+            score.save(score_meta_save_path)
             time.sleep(6)  # As this is quite a load-heavy request, it has special rules about rate limiting.
             # You are only allowed to do 10 requests per minute.
             # Also, please note that this request is not intended for batch retrievals.
-            score_with_replay = ScoreWithReplay(score, replay_data)
-            with open(score_save_path, 'wb') as f:
-                pickle.dump(score_with_replay, f)
