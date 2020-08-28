@@ -99,7 +99,7 @@ class Replay:
             f.write(self.raw_lzma_bytes)
 
     @classmethod
-    def from_path(cls, file_path):
+    def from_lzma(cls, file_path):
         score_id = os.path.splitext(os.path.basename(file_path))[0]
         with open(file_path, 'rb') as f:
             raw_bytes = f.read()

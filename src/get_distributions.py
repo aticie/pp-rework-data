@@ -15,7 +15,7 @@ def extract_max_velocity_data_as_npy(bmap_id, score_id, save_path):
     replay_path = os.path.join(scores_cache, f'{bmap_id}', f'{score_id}.lzma')
     score_meta_path = os.path.join(scores_cache, f'{bmap_id}', f'{score_id}.json')
 
-    replay = Replay.from_path(replay_path)
+    replay = Replay.from_lzma(replay_path)
     score_meta = ScoreMeta.from_path(score_meta_path)
 
     replay_frames = replay.parse_frames()
@@ -24,7 +24,7 @@ def extract_max_velocity_data_as_npy(bmap_id, score_id, save_path):
     bmap_path = os.path.join(bmap_cache, f'{bmap_id}.osu')
     bmap = Beatmap.from_path(bmap_path)
 
-    hitobj_pairs = get_hitobject_pairs(bmap, score_meta)
+    hitobj_pairs = get_hitobject_triples(bmap, score_meta)
 
     replay_frame_times = []
     for frame in replay_frames:
@@ -71,6 +71,8 @@ def extract_max_velocity_data_as_npy(bmap_id, score_id, save_path):
 
                               (hitobj_pair.hit_obj2.time - hitobj_pair.hit_obj1.time).total_seconds() * 1000,
                               # Time between hit objects
+
+                              hitobj_pair.angle,
                               int(score_meta.enabled_mods)
                               ]
 

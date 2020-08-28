@@ -64,6 +64,35 @@ You can do this on linux terminal:
 
 Run `get_distributions.py`. You'll get results in `data` folder in `{beatmap_id}_{score_id}.npy` format.
 
+#### Fields of the extracted data
+
+`{bmap_id}_{score_id}.npy` file contains an array of arrays. Each item in big array represents a valid hit object pair.
+Valid hit object pair is defined with the following conditions:
+
+- Both hit objects must be circle
+- Hit objects shouldn't be touching or stacked
+- Hit objects shouldn't be more than 0.8s apart (hacky way to ignore breaks)
+ 
+ Each valid hit object pair contains the following information:
+ 
+ 1. Max velocity.
+ 2. Mouse x position of second frame at the max velocity.
+ 3. Mouse y position of second frame at the max velocity. 
+ 4. Mouse x position of third frame at the max velocity. 
+ 5. Mouse y position of third frame at the max velocity.
+ 6. Time at second frame at max velocity in ms. 
+ 7. Time at third frame at max velocity in ms. 
+ 8. Second hit object x position. 
+ 9. Second hit object y position. 
+ 10. Third hit object x position. 
+ 11. Third hit object y position.
+ 12. Time of second hit object in ms. 
+ 13. Time of third hit object in ms. 
+ 14. Deltatime between hit objects in ms. (2-3)
+ 15. Angle between 3 hitobjects. (1-2-3) 
+ 16. Enabled mods in the replay as integer flag. See: https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osr_(file_format)#mods
+ 
+ 
 ### Visualize data
 
 Currently we are only looking for maximum distance between circle hit object pairs. To visualize this information run `
