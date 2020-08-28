@@ -76,21 +76,22 @@ Valid hit object pair is defined with the following conditions:
  Each valid hit object pair contains the following information:
  
  1. Max velocity.
- 2. Mouse x position of second frame at the max velocity.
- 3. Mouse y position of second frame at the max velocity. 
- 4. Mouse x position of third frame at the max velocity. 
- 5. Mouse y position of third frame at the max velocity.
- 6. Time at second frame at max velocity in ms. 
- 7. Time at third frame at max velocity in ms. 
- 8. Second hit object x position. 
- 9. Second hit object y position. 
- 10. Third hit object x position. 
- 11. Third hit object y position.
- 12. Time of second hit object in ms. 
- 13. Time of third hit object in ms. 
- 14. Deltatime between hit objects in ms. (2-3)
- 15. Angle between 3 hitobjects. (1-2-3) 
- 16. Enabled mods in the replay as integer flag. See: https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osr_(file_format)#mods
+ 1. Mouse x position of second frame at the max velocity.
+ 1. Mouse y position of second frame at the max velocity. 
+ 1. Mouse x position of third frame at the max velocity. 
+ 1. Mouse y position of third frame at the max velocity.
+ 1. Time at first frame at max velocity in ms. 
+ 1. Time at second frame at max velocity in ms. 
+ 1. Second hit object x position. 
+ 1. Second hit object y position. 
+ 1. Third hit object x position. 
+ 1. Third hit object y position.
+ 1. Distance between hit objects. (2-3) 
+ 1. Time of second hit object in ms. 
+ 1. Time of third hit object in ms. 
+ 1. Deltatime between hit objects in ms. (2-3)
+ 1. Angle between 3 hitobjects. (1-2-3) 
+ 1. Enabled mods in the replay as integer flag. See: https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osr_(file_format)#mods
  
  
 ### Visualize data

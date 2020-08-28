@@ -73,6 +73,8 @@ def extract_max_velocity_data_as_npy(bmap_id, score_id, save_path):
                               # Time between hit objects
 
                               hitobj_pair.angle,
+                              # Angle between 1-2-3
+
                               int(score_meta.enabled_mods)
                               ]
 
